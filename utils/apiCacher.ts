@@ -50,12 +50,9 @@ export class ApiCacher {
     fs.readdir('.next/cache/', (err, files) => {
       if (err) console.error(err)
       const foundFile = files.find((f) => f.startsWith(prefix))
-      console.log('prefix:', prefix)
-      console.log('file found:', foundFile)
       return (file += foundFile)
     })
 
-    console.log(`${prefix} file:`, file)
 
     return file
   }
@@ -105,9 +102,10 @@ export class ApiCacher {
         this.fileExists(filePrefix)
       )
       const timestampNow = this.getTimestamp()
-
+      
       if (timestampInCache === timestampNow) {
         const fileReturned = await this.readFile(this.fileExists(filePrefix))
+        console.log(`file with ${filePrefix} exists:`, fileReturned)
         return fileReturned
       }
     } else if (!this.fileExists(filePrefix)) {
