@@ -50,6 +50,7 @@ export class ApiCacher {
     fs.readdir('.next/cache/', (err, files) => {
       if (err) console.error(err)
       const foundFile = files.find((f) => f.startsWith(prefix))
+      console.log('file found:', foundFile)
       return (file += foundFile)
     })
 
