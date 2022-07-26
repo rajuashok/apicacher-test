@@ -35,7 +35,7 @@ export const getStaticPaths:GetStaticPaths = () => {
     const numbers:string[] = []
 
     for(let i = 100; i < 200; i++) {
-        numbers.push(`todo_${i}`)
+        numbers.push(i.toString())
     }
     
     const numbersToWrite = JSON.stringify(numbers, null, 2)
