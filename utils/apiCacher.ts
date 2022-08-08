@@ -47,12 +47,9 @@ export class ApiCacher {
    */
   fileExists(prefix: string): string {
     let file = ''
-    fs.readdir('.next/cache/', (err, files) => {
-      if (err) console.error(err)
-      const foundFile = files.find((f) => f.startsWith(prefix))
-      return (file += foundFile)
-    })
-
+    
+    const files = fs.readdirSync('.next/cache/')
+    file += files.find((f) => f.startsWith(prefix))
 
     return file
   }
