@@ -48,10 +48,20 @@ export class ApiCacher {
   fileExists(prefix: string): string {
     let file = ''
     
-    const files = fs.readdirSync('.next/cache/')
-    file += files.find((f) => f.startsWith(prefix))
-
-    return file
+    try {
+      const files = fs.readdirSync('.next/cache/')
+      const foundFile = files.find((f) => f.startsWith(prefix)) 
+      file += foundFile
+    }
+    catch(e) {
+      throw new Error(e)
+    }
+    if(file) {
+      return file
+    }
+    else {
+      return null
+    }
   }
 
   async readFile(fileName: string) {
@@ -92,20 +102,13 @@ export class ApiCacher {
 
   async fetchApiData(requestString, callback) {
     const filePrefix = this.routeStringToFilePrefix(requestString)
-
-    if (
-      this.fileExists(filePrefix)) {
-      const timestampInCache = this.getTimestampInCache(
-        this.fileExists(filePrefix)
-      )
-      const timestampNow = this.getTimestamp()
+    if(this.fileExists(filePrefix)) {
       
-      if (timestampInCache === timestampNow) {
-        const fileReturned = await this.readFile(this.fileExists(filePrefix))
-        console.log(`file with ${filePrefix} exists:`, fileReturned)
-        return fileReturned
-      }
-    } else if (!this.fileExists(filePrefix)) {
+    const fileReturned = await this.readFile(this.fileExists(filePrefix))
+    return fileReturned
+    } else if (this.fileExists(filePrefix) === null || this.fileExists(filePrefix) === undefined) {
+      console.log(this.fileExists(filePrefix))
+
       //this is being logged despite fileExists() logging showing that it's finding the files so what gives??
       console.log(
         'file with prefix',

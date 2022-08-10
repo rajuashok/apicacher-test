@@ -2,7 +2,6 @@ import { GetStaticPaths, GetStaticProps } from "next";
 import todosApi from "../../utils/todoApi";
 import fs from 'fs'
 import ids from '../../utils/ids.json'
-import { Todo } from "../../utils/types";
 
 
 

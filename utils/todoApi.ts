@@ -29,6 +29,7 @@ export class TodosApi {
             const response = await this.apiCacher.fetchApiData(queryString, async () => 
                 this.apiInstance.get(queryString,{ params: { }})
             )
+            
             return response
         }
         catch(err) {
