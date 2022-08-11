@@ -49,12 +49,11 @@ export class ApiCacher {
     let promise = new Promise<string>((resolve, reject) => {
       fs.readdir('.next/cache/', (err, files) => {
         if (err) {
-          console.warn("No cache file found", err)
           resolve(null)
         }
 
         const foundFile = files.find((f) => f.startsWith(prefix))
-        return resolve(foundFile)
+        return foundFile ? resolve(foundFile) : resolve(null)
       })
     })
 
@@ -104,7 +103,8 @@ export class ApiCacher {
     const filePrefix = this.routeStringToFilePrefix(requestString)
 
     const fileName = await this.getFileWithPrefix(filePrefix);
-    if (fileName != null) {
+    console.log(fileName)
+    if (fileName) {
       const cacheFileDate = this.getCacheFileDate(fileName)
       const todayDate = this.getTodayDate()
 
@@ -113,7 +113,7 @@ export class ApiCacher {
         // console.log(`file with ${filePrefix} exists:`, fileReturned)
         return fileReturned
       }
-    } else if (!this.getFileWithPrefix(filePrefix)) {
+    } else {
       //this is being logged despite fileExists() logging showing that it's finding the files so what gives??
       console.log(
         'file with prefix',

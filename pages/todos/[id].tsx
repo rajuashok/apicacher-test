@@ -22,6 +22,7 @@ export default Page
 export const getStaticProps:GetStaticProps = async (context) => {
     const id = context.params.id.toString().match(/\d+/g)[0]
     const data = await todosApi.getTodo(id)
+    console.log(data);
      
     return {
         props: {
