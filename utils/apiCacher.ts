@@ -110,7 +110,7 @@ export class ApiCacher {
 
       if (cacheFileDate === todayDate) {
         const fileReturned = await this.readFile(fileName)
-        console.log(`file with ${filePrefix} exists:`, fileReturned)
+        // console.log(`file with ${filePrefix} exists:`, fileReturned)
         return fileReturned
       }
     } else if (!this.getFileWithPrefix(filePrefix)) {
