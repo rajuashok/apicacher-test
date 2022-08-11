@@ -4,7 +4,7 @@ export class ApiCacher {
   /**
    * @returns - A date string, such as: "2022-06-15"
    */
-  getTimestamp() {
+  getTodayDate() {
     const timestampNow = new Date()
     const timestampDate = timestampNow.toLocaleString('en-US', {
       timeZone: 'America/Los_Angeles',
@@ -21,7 +21,7 @@ export class ApiCacher {
    * @param fileName - The whole file name of a cache file, such as: "api_sports_team_408_2022-06-16.json"
    * @returns - The date string in the file name.
    */
-  getTimestampInCache(fileName: string) {
+  getCacheFileDate(fileName: string) {
     const nameArray = fileName.split('.')[0].split('_')
     return nameArray[nameArray.length - 1]
   }
@@ -45,16 +45,20 @@ export class ApiCacher {
    * @param prefix - A prefix of a cache file, such as "api_sports_team_408"
    * @returns - `null` or the whole file name: "api_sports_team_408_2022-06-16.json"
    */
-  fileExists(prefix: string): string {
-    let file = ''
-    fs.readdir('.next/cache/', (err, files) => {
-      if (err) console.error(err)
-      const foundFile = files.find((f) => f.startsWith(prefix))
-      return (file += foundFile)
+  async getFileWithPrefix(prefix: string): Promise<string> {
+    let promise = new Promise<string>((resolve, reject) => {
+      fs.readdir('.next/cache/', (err, files) => {
+        if (err) {
+          console.warn("No cache file found", err)
+          resolve(null)
+        }
+
+        const foundFile = files.find((f) => f.startsWith(prefix))
+        return resolve(foundFile)
+      })
     })
 
-
-    return file
+    return promise
   }
 
   async readFile(fileName: string) {
@@ -70,10 +74,12 @@ export class ApiCacher {
 
   async writeFile(filePrefix: string, data: any) {
     const dataToWrite = JSON.stringify(data)
+    console.log(data)
 
     // Add a date string when created a cache file
-    const timestamp = this.getTimestamp()
+    const timestamp = this.getTodayDate()
     const path = `.next/cache/${filePrefix}_${timestamp}.json`
+    console.log("WRiting File")
 
     await fs.writeFile(path, dataToWrite, (err) => {
       err ? console.error(err) : console.log('files saved to json: ', path)
@@ -82,6 +88,7 @@ export class ApiCacher {
 
   async generateCacheFile(prefix: string, callbackFn: any, reqStr: string) {
     try {
+      console.log("generate cache file")
       const res = await callbackFn()
       const result = res.data
       await this.writeFile(prefix, result)
@@ -96,19 +103,17 @@ export class ApiCacher {
   async fetchApiData(requestString, callback) {
     const filePrefix = this.routeStringToFilePrefix(requestString)
 
-    if (
-      this.fileExists(filePrefix)) {
-      const timestampInCache = this.getTimestampInCache(
-        this.fileExists(filePrefix)
-      )
-      const timestampNow = this.getTimestamp()
-      
-      if (timestampInCache === timestampNow) {
-        const fileReturned = await this.readFile(this.fileExists(filePrefix))
+    const fileName = await this.getFileWithPrefix(filePrefix);
+    if (fileName != null) {
+      const cacheFileDate = this.getCacheFileDate(fileName)
+      const todayDate = this.getTodayDate()
+
+      if (cacheFileDate === todayDate) {
+        const fileReturned = await this.readFile(fileName)
         console.log(`file with ${filePrefix} exists:`, fileReturned)
         return fileReturned
       }
-    } else if (!this.fileExists(filePrefix)) {
+    } else if (!this.getFileWithPrefix(filePrefix)) {
       //this is being logged despite fileExists() logging showing that it's finding the files so what gives??
       console.log(
         'file with prefix',
